@@ -1,7 +1,6 @@
 use cgmath::{Matrix4, Point2, Vector2, Vector3, Vector4};
 use std::{path};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc};
 
 use crate::{
     error::GameResult,
@@ -42,7 +41,7 @@ pub struct Image {
     filter: FilterMode,
     pub(crate) bindings: Bindings,
     pub(crate) pipeline: Pipeline,
-    dirty_filter: Arc<AtomicBool>,
+    dirty_filter: DirtyFlag,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -145,7 +144,7 @@ impl Image {
             texture,
             bindings,
             pipeline,
-            dirty_filter: Arc::new(AtomicBool::new(false)),
+            dirty_filter: DirtyFlag::new(false),
             filter: FilterMode::Linear,
         })
     }
@@ -164,7 +163,7 @@ impl Image {
     }
 
     pub fn set_filter(&mut self, filter: FilterMode) {
-        self.dirty_filter.store(true, Ordering::Release);
+        self.dirty_filter.store(true);
         self.filter = filter;
     }
 
@@ -200,8 +199,8 @@ impl Drawable for Image {
     fn draw(&self, ctx: &mut Context, param: DrawParam) -> GameResult {
         let transform = param_to_instance_transform(&param, self.width, self.height);
 
-        if self.dirty_filter.load(Ordering::Acquire) {
-            self.dirty_filter.store(false, Ordering::Release);
+        if self.dirty_filter.load() {
+            self.dirty_filter.store(false);
             self.texture.set_filter(self.filter as i32);
         }
 
@@ -285,5 +284,28 @@ pub(crate) mod batch_shader {
     #[derive(Debug)]
     pub struct Uniforms {
         pub projection: cgmath::Matrix4<f32>,
+    }
+}
+
+#[derive(Debug)]
+struct DirtyFlag(AtomicBool);
+
+impl DirtyFlag {
+    pub fn new(value: bool) -> Self {
+        Self(AtomicBool::new(value))
+    }
+
+    pub fn load(&self) -> bool {
+        self.0.load(Ordering::Acquire)
+    }
+    
+    pub fn store(&self, value: bool) {
+        self.0.store(value, Ordering::Release)
+    }
+}
+
+impl Clone for DirtyFlag {
+    fn clone(&self) -> Self {
+        DirtyFlag(AtomicBool::new(self.0.load(Ordering::Acquire)))
     }
 }
