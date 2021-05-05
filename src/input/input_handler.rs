@@ -50,14 +50,6 @@ impl InputHandler {
         self.mouse_position = mouse;
     }
 
-    // pub fn handle_mouse_down(&mut self, button: WebMouseButton) {
-    //     self.mouse_keys.insert(MouseButton::from(&button));
-    // }
-
-    // pub fn handle_mouse_up(&mut self, button: WebMouseButton) {
-    //     self.mouse_keys.remove(&MouseButton::from(&button));
-    // }
-
     pub fn handle_key_down(&mut self, key: String) {
         self.keys.insert(key.clone());
         self.frame_keys.insert(key.clone());

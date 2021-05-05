@@ -2,6 +2,7 @@ use crate::{
     graphics::{types::Rect, Canvas},
     GameResult,
 };
+use miniquad_text_rusttype::FontAtlas;
 use miniquad_text_rusttype::FontTexture;
 use std::rc::Rc;
 
@@ -16,7 +17,6 @@ pub struct GraphicsContext {
     pub(crate) screen_rect: Rect,
     pub(crate) projection: Matrix4<f32>,
     pub(crate) white_texture: miniquad::Texture,
-    //pub(crate) text_cache: HashMap<String, GpuText>,
     pub(crate) canvas: Option<Canvas>,
     pub(crate) sprite_pipeline: miniquad::Pipeline,
     pub(crate) mesh_pipeline: miniquad::Pipeline,
@@ -129,7 +129,6 @@ impl GraphicsContext {
             projection,
             screen_rect,
             white_texture,
-            //text_cache: HashMap::new(),
             canvas: None,
             sprite_pipeline,
             mesh_pipeline,
@@ -183,7 +182,7 @@ fn load_font(
         ctx,
         font_data,
         font_size,
-        FontTexture::ascii_character_list(),
+        FontAtlas::ascii_character_list(),
     )?)
 }
 

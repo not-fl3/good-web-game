@@ -19,13 +19,13 @@ impl AudioContext {
         }
     }
 }
-pub struct Source {
+pub struct SoundSource {
     sound: Sound,
     mixer: Rc<RefCell<Option<SoundMixer>>>,
 }
 
-impl Source {
-    pub fn new(ctx: &mut Context, path: &str) -> GameResult<Source> {
+impl SoundSource {
+    pub fn new(ctx: &mut Context, path: &str) -> GameResult<SoundSource> {
         use std::io::Read;
 
         let mut file = filesystem::open(ctx, path)?;
@@ -41,7 +41,7 @@ impl Source {
         } else {
             panic!("Unsupported format. NOTE: gwg determines file format by path string, path should and with .wav or .ogg");
         };
-        Ok(Source {
+        Ok(SoundSource {
             sound,
             mixer: ctx.audio_context.mixer.clone(),
         })
@@ -81,7 +81,7 @@ impl Source {
 
     pub fn set_fade_in(&mut self, _dur: std::time::Duration) {}
 
-    pub fn set_pitch(&mut self, ratio: f32) {}
+    pub fn set_pitch(&mut self, _ratio: f32) {}
 }
 
 /// This function should be called in one of the interaction event callbacks before any usages of audio

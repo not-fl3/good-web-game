@@ -30,17 +30,25 @@ impl Filesystem {
         if let Cache::Tar(ref tar_file) = conf.cache {
             let mut archive = tar::Archive::new(tar_file.as_slice());
 
-            for file in archive.entries().unwrap_or_else(|e| panic!(e)) {
+            for file in archive
+                .entries()
+                .unwrap_or_else(|_e| panic!("Failed on read archive entries"))
+            {
                 use std::io::Read;
 
-                let mut file = file.unwrap_or_else(|e| panic!(e));
-                let filename = std::path::PathBuf::from(file.path().unwrap_or_else(|e| panic!(e)));
+                let mut file = file.unwrap_or_else(|_e| panic!("Failed on open file"));
+                let path_buf = std::path::PathBuf::from(
+                    file.path()
+                        .unwrap_or_else(|_e| panic!("Failed on read file")),
+                );
+
                 let mut buf = vec![];
 
-                file.read_to_end(&mut buf).unwrap_or_else(|e| panic!(e));
+                file.read_to_end(&mut buf)
+                    .unwrap_or_else(|_e| panic!("Failed on read file"));
                 if buf.len() != 0 {
                     files.insert(
-                        filename,
+                        path_buf,
                         File {
                             bytes: io::Cursor::new(buf),
                         },

@@ -10,20 +10,20 @@ use ggez::{Context, GameResult};
 use std::time::Duration;
 
 struct MainState {
-    sound: audio::Source,
+    sound: audio::SoundSource,
 }
 
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
-        let sound = audio::Source::new(ctx, "/sound.ogg")?;
+        let sound = audio::SoundSource::new(ctx, "/sound.ogg")?;
         let s = MainState { sound };
         Ok(s)
     }
 
     // To test: play, play_later, play_detached(),
     // set_repeat, set_fade_in, set_pitch,
-    // basically every method on Source, actually,
-    // then the same ones for `SpatialSource`.
+    // basically every method on SoundSource, actually,
+    // then the same ones for `SpatialSoundSource`.
 
     /// Plays the sound multiple times
     fn play_detached(&mut self, _ctx: &mut Context) {
@@ -39,18 +39,18 @@ impl MainState {
     /// Fades the sound in over a second
     /// Which isn't really ideal 'cause the sound is barely a second long, but still.
     fn play_fadein(&mut self, ctx: &mut Context) {
-        let mut sound = audio::Source::new(ctx, "/sound.ogg").unwrap();
+        let mut sound = audio::SoundSource::new(ctx, "/sound.ogg").unwrap();
         sound.set_fade_in(Duration::from_millis(1000));
         sound.play_detached().unwrap();
     }
 
     fn play_highpitch(&mut self, ctx: &mut Context) {
-        let mut sound = audio::Source::new(ctx, "/sound.ogg").unwrap();
+        let mut sound = audio::SoundSource::new(ctx, "/sound.ogg").unwrap();
         sound.set_pitch(2.0);
         sound.play_detached().unwrap();
     }
     fn play_lowpitch(&mut self, ctx: &mut Context) {
-        let mut sound = audio::Source::new(ctx, "/sound.ogg").unwrap();
+        let mut sound = audio::SoundSource::new(ctx, "/sound.ogg").unwrap();
         sound.set_pitch(0.5);
         sound.play_detached().unwrap();
     }

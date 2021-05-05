@@ -58,7 +58,7 @@ impl Image {
 
     pub fn from_png_bytes(ctx: &mut Context, bytes: &[u8]) -> GameResult<Self> {
         let img = image::load_from_memory(&bytes)
-            .unwrap_or_else(|e| panic!(e))
+            .unwrap_or_else(|_e| panic!("Failed to load png from memory"))
             .to_rgba();
         let width = img.width() as u16;
         let height = img.height() as u16;
@@ -208,7 +208,7 @@ impl Drawable for Image {
 
 impl Drop for Image {
     fn drop(&mut self) {
-        if Arc::strong_count(&self.clones_hack) == 1 {
+        if Arc::weak_count(&self.clones_hack) == 1 {
             self.texture.delete();
             self.bindings.index_buffer.delete();
             self.bindings.vertex_buffers[0].delete();

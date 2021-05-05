@@ -81,6 +81,10 @@ struct EventHandlerWrapper {
 
 impl miniquad::EventHandlerFree for EventHandlerWrapper {
     fn update(&mut self) {
+        if !self.context.continuing {
+            self.context.quad_ctx.quit();
+        }
+
         self.event_handler.update(&mut self.context).unwrap();
         if let Some(ref mut mixer) = &mut *self.context.audio_context.mixer.borrow_mut() {
             mixer.frame();
@@ -144,20 +148,28 @@ pub fn start<F>(conf: conf::Conf, f: F) -> GameResult
 where
     F: 'static + FnOnce(&mut Context) -> Box<dyn EventHandler>,
 {
-    miniquad::start(miniquad::conf::Conf::default(), |ctx| {
-        let mut context = Context::new(ctx, conf);
+    miniquad::start(
+        miniquad::conf::Conf {
+            window_height: conf.window_height,
+            window_width: conf.window_width,
+            fullscreen: conf.fullscreen,
+            ..miniquad::conf::Conf::default()
+        },
+        |ctx| {
+            let mut context = Context::new(ctx, conf);
 
-        let (w, h) = context.quad_ctx.screen_size();
-        context
-            .gfx_context
-            .set_screen_coordinates(graphics::Rect::new(0., 0., w as f32, h as f32));
+            let (w, h) = context.quad_ctx.screen_size();
+            context
+                .gfx_context
+                .set_screen_coordinates(graphics::Rect::new(0., 0., w as f32, h as f32));
 
-        let event_handler = f(&mut context);
+            let event_handler = f(&mut context);
 
-        miniquad::UserData::free(EventHandlerWrapper {
-            event_handler,
-            context,
-        })
-    });
+            miniquad::UserData::free(EventHandlerWrapper {
+                event_handler,
+                context,
+            })
+        },
+    );
     Ok(())
 }

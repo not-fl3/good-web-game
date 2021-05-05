@@ -370,7 +370,7 @@ impl MeshBuilder {
         );
         let bindings = miniquad::Bindings {
             vertex_buffers: vec![vertex_buffer],
-            index_buffer: index_buffer,
+            index_buffer,
             images: self
                 .texture
                 .map_or(vec![ctx.gfx_context.white_texture], |texture| vec![texture]),
@@ -378,7 +378,7 @@ impl MeshBuilder {
         let rect = bbox_for_vertices(&self.buffer.vertices).expect("No vertices in MeshBuilder");
 
         Ok(Mesh {
-            bindings: bindings,
+            bindings,
             blend_mode: None,
             rect,
         })
@@ -504,6 +504,11 @@ impl Mesh {
     where
         P: Into<mint::Point2<f32>> + Clone,
     {
+        if points.len() < 3 {
+            return Err(GameError::LyonError(
+                "Mesh::new_polygon() got a list of < 3 points".to_string(),
+            ));
+        }
         let mut mb = MeshBuilder::new();
         let _ = mb.polygon(mode, points, color);
         mb.build(ctx)

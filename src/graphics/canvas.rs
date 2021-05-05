@@ -29,8 +29,6 @@ impl Canvas {
             },
         );
 
-        // let framebuffer = Framebuffer::new(ctx, &texture)
-        //     .ok_or_else(|| GameError::UnknownError("Couldn't create a Framebuffer"))?;
         let image = Image::from_texture(&mut ctx.quad_ctx, texture)?;
 
         let offscreen_pass = RenderPass::new(&mut ctx.quad_ctx, texture, None);

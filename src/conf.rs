@@ -29,6 +29,12 @@ pub struct Conf {
     ///
     /// Note that this won't work on platforms where `std::fs` is unavailable, like WASM.
     pub physical_root_dir: Option<PathBuf>,
+    pub window_title: String,
+    pub window_width: i32,
+    pub window_height: i32,
+    pub fullscreen: bool,
+    pub high_dpi: bool,
+    pub sample_count: i32,
 }
 
 impl Default for Conf {
@@ -37,6 +43,12 @@ impl Default for Conf {
             cache: Cache::No,
             loading: Loading::No,
             physical_root_dir: None,
+            window_title: "".to_owned(),
+            window_width: 800,
+            window_height: 600,
+            fullscreen: false,
+            high_dpi: false,
+            sample_count: 1,
         }
     }
 }
